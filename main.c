@@ -26,13 +26,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <unistd.h>
  
 int main(void)
 {
   CURL *curl;
   CURLcode res;
  
-  static const char *postthis = "{\"measurement\":{\"value\":17000,\"deviceId\":2}}";
+  static char *postthis = "{\"measurement\":{\"value\":1234,\"deviceId\":2}}";
  
   curl = curl_easy_init();
   if(curl) {
@@ -44,18 +45,29 @@ int main(void)
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(postthis));
     
     struct curl_slist *hs=NULL;
-	hs = curl_slist_append(hs, "Content-Type: application/json");
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
+    hs = curl_slist_append(hs, "Content-Type: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
+    
+    int counter = 0;
+    do{
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postthis);
+      printf("\n==============\n");
+      printf("Sending request");
+      printf("\n==============\n");
+      /* Perform the request, res will get the return code */
+      res = curl_easy_perform(curl);
+      /* Check for errors */
+      if(res != CURLE_OK){
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+      }
+      sleep(3);
+      /* always cleanup */
+      printf("\n==============\n");
+      printf("Sent request");
+      printf("\n==============\n");
+    }while(counter++<100);
  
-    /* Perform the request, res will get the return code */
-    res = curl_easy_perform(curl);
-    /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
- 
-    /* always cleanup */
-    curl_easy_cleanup(curl);
+    
   }
   return 0;
 }
