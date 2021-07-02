@@ -18,8 +18,8 @@ detect_indent_width=true
 indent_mode=2
 
 [project]
-name=helloWorld
-base_path=/home/pi/projects/helloWorld/
+name=rtrk-iot-praksa
+base_path=/home/pi/projects/rtrk-iot-praksa/
 description=
 file_patterns=
 
@@ -29,7 +29,7 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=1111;C;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fprojects%2FhelloWorld%2Fmain.c;0;4
+FILE_NAME_0=484;C;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Frtrk-iot-praksa%2Fmain.c;0;2
 
 [VTE]
 last_dir=/home/pi
@@ -38,7 +38,7 @@ last_dir=/home/pi
 CFT_00_LB=_Compile
 CFT_00_CM=gcc -lcurl -Wall -c "%f"
 CFT_00_WD=
-filetypes=C;
 CFT_01_LB=_Build
 CFT_01_CM=gcc -lcurl -Wall -o "%e" "%f"
 CFT_01_WD=
+filetypes=C;
