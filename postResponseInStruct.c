@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <unistd.h>
 
 struct string {
   char *ptr;
@@ -37,7 +38,7 @@ static char *postthis = "{\"measurement\":{\"value\":1234,\"deviceId\":2}}";
 
 int main(void)
 {
-  CURL *curl;\
+  CURL *curl;
 
   curl = curl_easy_init();
   if(curl) {
@@ -45,7 +46,7 @@ int main(void)
     init_string(&s);
 
     curl_easy_setopt(curl, CURLOPT_URL, "https://rtrk-iot-praksa.herokuapp.com/api/data");
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(postthis));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(postthis));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postthis);
     
     struct curl_slist *hs=NULL;
@@ -54,13 +55,22 @@ int main(void)
     
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
-    curl_easy_perform(curl);
+    
+    int counter = 0;
+    
+    do{
+      curl_easy_perform(curl);
 
-	printf("Caught response in struct START\n");
-    printf("%s\n", s.ptr);
-    free(s.ptr);
-	printf("Caught response in struct END\n");
+      printf("Caught response in struct START\n");
+      printf("%s\n", s.ptr);
+      printf("Caught response in struct END\n");
+      
+      sleep(10);
+    }while(counter++<100);
+    
+    
 
+      free(s.ptr);
     /* always cleanup */
     curl_easy_cleanup(curl);
   }
