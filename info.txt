@@ -1,5 +1,10 @@
 Prerequisite:
 	1. install libcurl on your device:
 		sudo apt-get install libcurl4 libcurl4-openssl-dev
+		
 To compile this, run:
-	gcc -lcurl -Wall -o "main" "main.c"
+	1. postRequestExample:
+		gcc -Wall -lcurl postRequestExample.c post_request.c -o postRequestExample
+	
+	2. getRequestExample:
+		gcc -Wall -lcurl getRequestExample.c get_request.c -o getRequestExample
