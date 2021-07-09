@@ -38,17 +38,14 @@ int main()
     int counter = 1;
     
     do{
-      printf("Caught response in struct START\n");
-      printf("%s\n", body.response);
-      printf("Caught response in struct END\n");
-      
+            
       if(counter%5 == 0)
       {
-	setBodyMeasurementValues(&body, 10.5, 20.5, 30.5, 40.6, 60.1, 70.2, 80.3, 90.8, 100.1, 110.42);
+          setBodyMeasurementValues(&body, 10.5, 20.5, 30.5, 40.6, 60.1, 70.2, 80.3, 90.8, 100.1, 110.42);
       }
       else
       {
-	setBodyMeasurementValue(&body, counter%11 , 15.3 + counter);
+          setBodyMeasurementValue(&body, counter%11 , -125.3 + 3*counter);
       }
       
       setBodyRequest(&body);
@@ -56,21 +53,12 @@ int main()
       curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(body.request));
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.request);
       
-      
       curl_easy_perform(curl);
+      printBody(&body);
       
-      printf("============ REQUEST ===============\n");
-      printf("%s\n", body.request);
-      printf("============ REQUEST END ===============\n");
-      
-      printf("============ RESPONSE ===============\n");
-      printf("%s\n", body.response);
-      printf("============ RESPONSE END ===============\n");
       sleep(3);
-    }while(counter++<100);
-    
-    
 
+    }while(counter++<100);
     free_body(&body);
     curl_easy_cleanup(curl);
   }

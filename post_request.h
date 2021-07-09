@@ -20,6 +20,19 @@
 #define MAG_Y 9
 #define MAG_Z 10
 
+
+
+extern const char* TEMPERATURE_KEY;
+extern const char* GYRO_X_KEY;
+extern const char* GYRO_Y_KEY;
+extern const char* GYRO_Z_KEY;
+extern const char* ACC_X_KEY;
+extern const char* ACC_Y_KEY;
+extern const char* ACC_Z_KEY;
+extern const char* MAG_X_KEY;
+extern const char* MAG_Y_KEY;
+extern const char* MAG_Z_KEY;
+
 typedef struct post_body {
   int deviceId;
   float temperatureValue;
@@ -68,6 +81,8 @@ void setBodyMeasurementValues(
 );
 void setBodyDeviceIdValue(post_body* body, int deviceId);
 void setBodyRequest(post_body* body);
+void parseBodyResponse(post_body *body);
+void printBody(post_body *body);
 void free_body(post_body *body);
 size_t writeFunc(void *ptr, size_t size, size_t nmemb, post_body *body);
 
