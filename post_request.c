@@ -1,5 +1,9 @@
 #include "post_request.h"
 
+
+const char* SERIAL_NUMBER_KEY = "serialNumber";
+const char* MEASUREMENT_INTERVAL_KEY = "measurementInterval";
+
 const char* TEMPERATURE_KEY = "temperature";
 const char* GYRO_X_KEY = "gyroX";
 const char* GYRO_Y_KEY = "gyroY";
@@ -18,6 +22,10 @@ char* initializeCharArray(int size)
   return array;
 }
 
+void setBodyMeasurementIntervalValue(post_body* body, int value){
+  body->measurementInterval = value;
+  sprintf(body->measurementIntervalString, "%d", value); 
+}
 
 void setBodyTemperatureValue(post_body* body, float value){
   body->temperatureValue = value;
@@ -76,6 +84,10 @@ void initializePostBody(post_body *body, int deviceId) {
   body->deviceIdString = initializeCharArray(DEVICE_ID_STRING_SIZE);
   setBodyDeviceIdValue(body, deviceId);
   
+  body->serialNumberString = initializeCharArray(SERIAL_NUMBER_STRING_SIZE);
+  body->measurementIntervalString = initializeCharArray(VALUE_STRING_SIZE);
+  setBodyMeasurementIntervalValue(body, 0);
+  
   body->temperatureString = initializeCharArray(VALUE_STRING_SIZE);
   setBodyTemperatureValue(body, 0);
   
@@ -103,7 +115,11 @@ void initializePostBody(post_body *body, int deviceId) {
 
 void setBodyStrings(post_body *body)
 {
-  sprintf(body->deviceIdString, "%d", body->deviceId); 
+  sprintf(body->deviceIdString, "%d", body->deviceId);
+  
+  sprintf(body->measurementIntervalString, "%d", body->measurementInterval); 
+  
+  sprintf(body->temperatureString, "%.2f", body->temperatureValue);
   
   sprintf(body->gyroXString, "%.2f", body->gyroXValue); 
   sprintf(body->gyroYString, "%.2f", body->gyroYValue); 
@@ -224,7 +240,6 @@ void setBodyRequest(post_body* body)
 void extractValueFromJSON(char* source, char* destinationString, const char* searchKey, float* destinationValue)
 {
   char* ptr = strstr(source, searchKey);
-  *destinationValue = 10.0;
   int offset_1 = 0;
   char c_1;
   char notDone_1 = 1;
@@ -238,7 +253,7 @@ void extractValueFromJSON(char* source, char* destinationString, const char* sea
       char c_2;
       do{
         c_2 = ptr[offset_1+offset_2];
-        if(c_2 != ',')
+        if(c_2 != ','&&c_2!='}')
         {
           destinationString[offset_2++] = c_2;
         }
@@ -254,22 +269,74 @@ void extractValueFromJSON(char* source, char* destinationString, const char* sea
   }while(notDone_1);
 }
 
+void extractIntegerValueFromJSON(char* source, char* destinationString, const char* searchKey, int* destinationValue)
+{
+  char* ptr = strstr(source, searchKey);
+  int offset_1 = 0;
+  char c_1;
+  char notDone_1 = 1;
+  do{
+    c_1 = ptr[offset_1];
+    if (c_1 == ':')
+    {
+      offset_1++;
+      int offset_2 = 0;
+      char notDone_2 = 1;
+      char c_2;
+      do{
+        c_2 = ptr[offset_1+offset_2];
+        if(c_2 != ','&&c_2!='}')
+        {
+          destinationString[offset_2++] = c_2;
+        }
+        else
+        {
+          notDone_1 = 0;
+          notDone_2 = 0;
+          destinationString[offset_2] = '\0';
+          sscanf(destinationString,"%d", destinationValue);
+        }
+      }while(notDone_2);
+    }else offset_1++;
+  }while(notDone_1);
+}
+
+void extractStringValueFromJSON(char* source, char* destinationString, const char* searchKey)
+{
+  char* ptr = strstr(source, searchKey);
+  int offset_1 = 0;
+  char c_1;
+  char notDone_1 = 1;
+  do{
+    c_1 = ptr[offset_1];
+    if (c_1 == ':')
+    {
+      offset_1+=2;
+      int offset_2 = 0;
+      char notDone_2 = 1;
+      char c_2;
+      do{
+        c_2 = ptr[offset_1+offset_2];
+        if(c_2 != ','&&c_2!='}'&&c_2!='\"')
+        {
+          destinationString[offset_2++] = c_2;
+        }
+        else
+        {
+          notDone_1 = 0;
+          notDone_2 = 0;
+          destinationString[offset_2] = '\0';
+        }
+      }while(notDone_2);
+    }else offset_1++;
+  }while(notDone_1);
+}
+
 
 void parseBodyResponse(post_body *body)
 {
-  extractValueFromJSON(body->response, body->temperatureString, TEMPERATURE_KEY, &(body->temperatureValue));
-  
-  extractValueFromJSON(body->response, body->gyroXString, GYRO_X_KEY, &(body->gyroXValue));
-  extractValueFromJSON(body->response, body->gyroYString, GYRO_Y_KEY, &(body->gyroYValue));
-  extractValueFromJSON(body->response, body->gyroZString, GYRO_Z_KEY, &(body->gyroZValue));
-  
-  extractValueFromJSON(body->response, body->accXString, ACC_X_KEY, &(body->accXValue));
-  extractValueFromJSON(body->response, body->accYString, ACC_Y_KEY, &(body->accYValue));
-  extractValueFromJSON(body->response, body->accZString, ACC_Z_KEY, &(body->accZValue));
-  
-  extractValueFromJSON(body->response, body->magXString, MAG_X_KEY, &(body->magXValue));
-  extractValueFromJSON(body->response, body->magYString, MAG_Y_KEY, &(body->magYValue));
-  extractValueFromJSON(body->response, body->magZString, MAG_Z_KEY, &(body->magZValue));
+  extractIntegerValueFromJSON(body->response, body->measurementIntervalString, MEASUREMENT_INTERVAL_KEY, &(body->measurementInterval));
+  extractStringValueFromJSON(body->response, body->serialNumberString, SERIAL_NUMBER_KEY);
 }
 
 void printBody(post_body *body)
@@ -306,6 +373,12 @@ void printBody(post_body *body)
   printf("%s : ", MAG_Z_KEY);
   printf("%s\n", body->magZString);
   
+  printf("%s : ", SERIAL_NUMBER_KEY);
+  printf("%s\n", body->serialNumberString);
+  
+  printf("%s : ", MEASUREMENT_INTERVAL_KEY);
+  printf("%s\n", body->measurementIntervalString);
+  
   printf("=======END BODY========\n");
 }
 
@@ -316,6 +389,8 @@ void free_body(post_body *body)
   free(body->response);
   
   free(body->deviceIdString);
+  free(body->serialNumberString);
+  free(body->measurementIntervalString);
   
   free(body->temperatureString);
   

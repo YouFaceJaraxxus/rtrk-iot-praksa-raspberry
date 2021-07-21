@@ -7,8 +7,9 @@
 #include <curl/curl.h>
 #include <unistd.h>
 #define BUFFER_SIZE 10240 //10 kB
-#define VALUE_STRING_SIZE 20 //10 kB
-#define DEVICE_ID_STRING_SIZE 10 //10 kB
+#define SERIAL_NUMBER_STRING_SIZE 20
+#define VALUE_STRING_SIZE 20
+#define DEVICE_ID_STRING_SIZE 10
 #define TEMPERATURE 1
 #define GYRO_X 2
 #define GYRO_Y 3
@@ -19,8 +20,11 @@
 #define MAG_X 8
 #define MAG_Y 9
 #define MAG_Z 10
+#define MEASUREMENT_INTERVAL 11
 
 
+extern const char* SERIAL_NUMBER_KEY;
+extern const char* MEASUREMENT_INTERVAL_KEY;
 
 extern const char* TEMPERATURE_KEY;
 extern const char* GYRO_X_KEY;
@@ -35,6 +39,8 @@ extern const char* MAG_Z_KEY;
 
 typedef struct post_body {
   int deviceId;
+  int measurementInterval;
+  
   float temperatureValue;
   float gyroXValue;
   float gyroYValue;
@@ -47,6 +53,9 @@ typedef struct post_body {
   float magZValue;
   
   char *deviceIdString;
+  char *serialNumberString;
+  char *measurementIntervalString;
+  
   char *temperatureString;
   char *gyroXString;
   char *gyroYString;

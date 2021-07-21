@@ -54,6 +54,8 @@ int main()
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.request);
       
       curl_easy_perform(curl);
+      printf("%s\n", body.response);
+      parseBodyResponse(&body);
       printBody(&body);
       
       sleep(3);
