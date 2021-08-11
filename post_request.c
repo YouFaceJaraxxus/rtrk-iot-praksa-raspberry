@@ -207,7 +207,7 @@ void setBodyDeviceIdValue(post_body* body, int deviceId){
 void setBodyRequest(post_body* body)
 {
   char* requestPointer = body-> request;
-  strcpy(requestPointer, "{\"measurement\":{\"temperature\":");
+  strcpy(requestPointer, "{\"temperature\":");
   strcat(requestPointer, body->temperatureString);
   
   strcat(requestPointer, ",\"gyroX\":");
@@ -233,7 +233,7 @@ void setBodyRequest(post_body* body)
   
   strcat(requestPointer, ",\"deviceId\":");
   strcat(requestPointer, body->deviceIdString);
-  strcat(requestPointer, "}}");
+  strcat(requestPointer, "}");
 }
 
 
